@@ -1,9 +1,7 @@
-# ProjectTemplate
-This project will be made available as a project template for this organization. All projects should start from here.
+# Midtown Radio App
+MidTown Radio mobile App which will provide access to their live stream, podcasts, and artits directory.
 
-# Start with a story
-
-What is the need? How are we trying to meet it? Who's going to use this?
+This app will give MidTown another way to reach their audience. The [CBC Listen App](https://www.cbc.ca/listen/live-radio) is an example of what they are looking for.
 
 # Housekeeping
 
