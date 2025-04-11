@@ -99,7 +99,8 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
 
           // hamburger button to open side drawer
-          leading: Builder(
+          automaticallyImplyLeading: false,
+          /* leading: Builder(
             builder: (context) => IconButton(
               color: colors.onSecondary,
               icon: Icon(Icons.menu),
@@ -107,17 +108,52 @@ class _MyHomePageState extends State<MyHomePage> {
                 Scaffold.of(context).openDrawer();
               },
             ),
-          ),
+          ), */
           // TRY THIS: Try changing the color here to a specific color (to
           // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
           // change color while the other colors stay the same.
           backgroundColor: Theme.of(context).colorScheme.primary,
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Image.asset(
-            'assets/WORDMARK PNG.png',
-            height: 120,
-          ),
+          title: /* Image.asset(
+                  'assets/WORDMARK PNG.png',
+                  height: 120,
+                ) */
+          
+          SizedBox(
+            width: double.infinity,
+            height:180,
+            child:Stack(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Builder(
+                    builder: (context) => IconButton(
+                      color: colors.onSecondary,
+                      icon: Icon(Icons.menu),
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    'assets/WORDMARK PNG.png',
+                    height: 120,
+                  )
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Image.asset(
+                    'assets/hashtag-local-af.png',
+                    width: 80,
+                  )
+                )
+              ],
+            )),
+          centerTitle: true,
           // page selection
           bottom: TabBar(
             labelColor: colors.onPrimary,
