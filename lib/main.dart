@@ -34,7 +34,18 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme(
+          brightness: Brightness.dark,
+          primary: Color(0x00000000),
+          onPrimary: Color(0xff00fffb),
+          secondary: Color(0x00000000),
+          onSecondary: Color(0xffffffff),
+          tertiary: Color(0xffff4564),
+          error: Color(0xffcc0000),
+          onError: Color(0xffffffff),
+          surface: Color(0xff4a4a4a),
+          onSurface: Color(0xff00fffb),
+        ),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -73,6 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -89,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // hamburger button to open side drawer
           leading: Builder(
             builder: (context) => IconButton(
+              color: colors.onSecondary,
               icon: Icon(Icons.menu),
               onPressed: () {
                 Scaffold.of(context).openDrawer();
@@ -98,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // TRY THIS: Try changing the color here to a specific color (to
           // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
           // change color while the other colors stay the same.
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: Image.asset(
@@ -107,6 +120,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           // page selection
           bottom: TabBar(
+            labelColor: colors.onPrimary,
+            unselectedLabelColor: colors.onSecondary,
             tabs: [
               Tab(
                 child: Text("Live")
