@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 import 'controller.dart';
 
-class SettingsView extends StatefulWidget {
-  const SettingsView({
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({
     super.key,
     required this.controller,
     });
 
   static const routeName = '/settings';
-  static const String title = 'Settings';
+  final String title = 'Settings';
 
   final SettingsController controller;
 
   @override
-  _SettingsViewState createState() => _SettingsViewState();
+  SettingsPageState createState() => SettingsPageState();
 }
 
-class _SettingsViewState extends State<SettingsView> {
+class SettingsPageState extends State<SettingsPage> {
   late ThemeMode _themeMode;
+
+  final String routeName = '/settings';
+  final String title = 'Settings';
 
   @override
   void initState() {
@@ -35,7 +38,6 @@ class _SettingsViewState extends State<SettingsView> {
     widget.controller.updateThemeMode(newThemeMode);
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
