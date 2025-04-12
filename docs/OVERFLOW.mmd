@@ -1,0 +1,35 @@
+---
+title: Main Application Flowchart
+author: Julian Morley
+date: 2025-04-12
+version: 1.0
+version_history:
+  - 1.0: Initial version - 2025-04-12
+---
+
+flowchart
+    A([Application Start])
+    A --> B[Home Screen]
+    B --> B1[Listen Live]
+    B --> B2[On Demand]
+    A --> S[Settings]
+
+    subgraph Listen Live
+    B1 --> B1A[Press Play Button]
+    B1A --> B1B[Set stream to live url 'A']
+    end
+
+    subgraph On Demand
+    B2 --> B2A[Display On Demand List]
+    B2A --> B2B[Select On Demand Item]
+    B2B --> B2C[Set stream to on demand url]
+    end
+    B1B --> AP((Audio Player))
+    B2C --> AP
+
+    subgraph Settings
+    S --> S1{Change Theme}
+    S1 --> SS1[Light Mode]
+    S1 --> SS2[Dark Mode]
+    S1 --> SS3[System Default]
+    end
