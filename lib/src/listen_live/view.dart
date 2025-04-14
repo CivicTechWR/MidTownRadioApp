@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ctwr_midtown_radio_app/src/media_player/widget.dart';
 import 'package:provider/provider.dart';
 import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
-import 'package:ctwr_midtown_radio_app/src/media_player/fullscreen_player.dart';
 
 class ListenLivePage extends StatelessWidget {
   const ListenLivePage({super.key});
@@ -61,31 +60,5 @@ class ListenLivePage extends StatelessWidget {
         ],
       ),
     );
-  }
-
- void _showPlayerSheet(BuildContext context) {
-   final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
-   
-    final mediaQuery = MediaQuery.of(context);
-    final safePadding = mediaQuery.viewPadding.top;
-    final screenHeight = mediaQuery.size.height;
-
-    playerProvider.isFullScreen = true;
-    
-    showModalBottomSheet(
-      barrierColor: Colors.transparent,
-      
-      context: context,
-      isScrollControlled: true,
-
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: screenHeight,
-        margin: EdgeInsets.only(top: safePadding),
-        child: FullScreenPlayer(),
-      ),
-    ).then((_) {
-      playerProvider.isFullScreen = false;
-    });
   }
 }
