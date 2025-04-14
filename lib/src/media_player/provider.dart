@@ -2,30 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:ctwr_midtown_radio_app/src/media_player/service.dart';
 
 class PlayerProvider extends ChangeNotifier {
-  final PlayerService _playerService;
+  final PlayerService playerService;
+  bool _isLoading = false;
 
-  PlayerProvider(this._playerService);
+  PlayerProvider(this.playerService);
 
-  String? get currentSreamUrl => _playerService.currentStreamUrl;
-  bool get isPlaying => _playerService.player.playing;
+  String? get currentSreamUrl => playerService.currentStreamUrl;
+  
+  bool get isPlaying => playerService.player.playing;
+  bool get isLoading => _isLoading;
+  
 
   Future<void> setStream(String url) async {
-    await _playerService.setStream(url);
+    _isLoading = true;
+    notifyListeners();
+
+    await playerService.setStream(url);
+    _isLoading = false;
     notifyListeners();
   }
 
   Future<void> play() async {
-    await _playerService.play();
+    playerService.play();
     notifyListeners();
   }
 
   Future<void> pause() async {
-    await _playerService.pause();
+    await playerService.pause();
     notifyListeners();
   }
 
   Future<void> stop() async {
-    await _playerService.stop();
+    await playerService.stop();
     notifyListeners();
   }
 }
