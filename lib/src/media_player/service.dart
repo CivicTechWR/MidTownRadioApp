@@ -27,14 +27,11 @@ class PlayerService {
   Future<void> setStream(String url) async {
     if (_currentStreamUrl == url) return;
 
-    print("This ran 1");
     try {
       // if (await session.setActive(true)) {
-          print("This ran 2");
 
         _currentStreamUrl = url;
         await _audioPlayer.setUrl(url);
-            print("This ran 3");
 
         _audioPlayer.play();
   
@@ -44,7 +41,6 @@ class PlayerService {
       _currentStreamUrl = null;
       rethrow;
     }
-        print("This ran 5");
 
   }
 
