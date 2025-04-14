@@ -29,14 +29,19 @@ class PlayerService {
 
     try {
       // if (await session.setActive(true)) {
+
         _currentStreamUrl = url;
         await _audioPlayer.setUrl(url);
-        await _audioPlayer.play();
+
+        _audioPlayer.play();
+  
+
       // }
     } catch (e) {
       _currentStreamUrl = null;
       rethrow;
     }
+
   }
 
   Future<void> play() async {
