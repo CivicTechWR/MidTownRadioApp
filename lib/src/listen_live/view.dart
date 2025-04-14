@@ -11,22 +11,43 @@ class ListenLivePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final playerProvider = Provider.of<PlayerProvider>(context, listen: true);
+    final playerProvider = Provider.of<PlayerProvider>(context);
     
 
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          ElevatedButton(
+          playerProvider.isLoading
+          ? const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: 100,
+                height: 100,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.0,
+                ),
+              ),
+            )
+          : ElevatedButton(
             onPressed: () {
-              playerProvider.setStream('https://midtownradiokw.out.airtime.pro/midtownradiokw_a');
-              playerProvider.play();
-
-              _showPlayerSheet(context);
+              
+              // first click loads stream, starts stream, and pops up full screen
+              if (playerProvider.currentSreamUrl == null){
+                playerProvider.setStream('https://midtownradiokw.out.airtime.pro/midtownradiokw_a');
+                playerProvider.play();
+                PlayerWidget.showPlayerSheet(context);
+              // after first click, when music is already loaded its a play/pause
+              } else if (playerProvider.isPlaying){
+                playerProvider.pause();
+              } else{
+                playerProvider.play();
+              }
+              
             }, 
-            child: const Icon(Icons.play_arrow, size: 100),
+            child: Icon(playerProvider.isPlaying ? Icons.pause : Icons.play_arrow, size: 100),
           ),
+          
           const SizedBox(height: 20),
           const Text(
             'Listen Live!',
@@ -35,46 +56,36 @@ class ListenLivePage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 10),
-          const PlayerWidget(),
+          const SizedBox(height: 32),
+          //const PlayerWidget(),
         ],
       ),
     );
   }
 
-  void _showPlayerSheet(BuildContext context) {
+ void _showPlayerSheet(BuildContext context) {
+   final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+   
     final mediaQuery = MediaQuery.of(context);
     final safePadding = mediaQuery.viewPadding.top;
     final screenHeight = mediaQuery.size.height;
+
+    playerProvider.isFullScreen = true;
     
     showModalBottomSheet(
+      barrierColor: Colors.transparent,
+      
       context: context,
       isScrollControlled: true,
+
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: screenHeight * 0.9,
-        margin: EdgeInsets.only(top: safePadding + 10), // Extra 10 for breathing room
-        decoration:  BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SafeArea( // Additional protection
-          child: Column(
-            children: [
-              // Drag handle
-              Container(
-                margin: const EdgeInsets.only(top: 8, bottom: 8),
-                width: 40,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.grey[400],
-                  borderRadius: BorderRadius.circular(5),
-              ),),
-              Expanded(child: FullScreenPlayer()),
-            ],
-          ),
-        ),
+        height: screenHeight,
+        margin: EdgeInsets.only(top: safePadding),
+        child: FullScreenPlayer(),
       ),
-    );
+    ).then((_) {
+      playerProvider.isFullScreen = false;
+    });
   }
 }

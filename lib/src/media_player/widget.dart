@@ -1,98 +1,118 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
 import 'package:ctwr_midtown_radio_app/src/media_player/fullscreen_player.dart';
-
+import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
 
 class PlayerWidget extends StatelessWidget {
+  final GlobalKey<NavigatorState> navigatorKey;
+
   const PlayerWidget({
-    super.key
+    super.key,
+    required this.navigatorKey
   });
+
+  // if user taps on bottom control bar, this gets called and fullscreen pops up
+  static void showPlayerSheet(BuildContext context) {
+   final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+   
+    final rootContext = Navigator.of(context, rootNavigator: true).context;
+    final mediaQuery = MediaQuery.of(rootContext);
+    final safePadding = mediaQuery.viewPadding.top;
+    final screenHeight = mediaQuery.size.height;
+
+    playerProvider.isFullScreen = true;
+    
+    showModalBottomSheet(
+      barrierColor: Colors.transparent,
+      
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: true,
+
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: screenHeight,
+        margin: EdgeInsets.only(top: safePadding),
+        child: FullScreenPlayer(),
+      ),
+    ).then((_) {
+      playerProvider.isFullScreen = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final playerProvider = Provider.of<PlayerProvider>(context, listen: true);
+    final playerProvider = Provider.of<PlayerProvider>(context);
+    final mediaQuery = MediaQuery.of(context);
+    final safePadding = mediaQuery.viewPadding.bottom;
+    final theme = Theme.of(context);
 
     return GestureDetector(
-      onTap:() => _showPlayerSheet(context),
+      onTap: () =>showPlayerSheet(navigatorKey.currentContext!),
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        
+        // can adjust this margin to raise this widget - I picked +20 arbitrairily
+        // safePadding puts it above any OS buttons like the IOS home swipe bar, so it should stay
+        padding: EdgeInsets.only(
+          top: 8.0,
+          left: 8.0,
+          right: 8.0,
+          bottom: safePadding + 20,
+        ),
         decoration: BoxDecoration(
-          color: Colors.grey[200],
-          border: Border(top: BorderSide(color: Colors.grey[300]!)),
+          color: theme.cardColor,
+          //color: Colors.grey[200],
+          border: Border(top: BorderSide(color: theme.dividerColor)),
         ),
         child: Row(
           children: [
-            playerProvider.isLoading ? Padding(
-              padding: const EdgeInsets.all(8.0), // Same padding as IconButton
-              child: SizedBox(
-                width: 24, // Typical icon button size
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.0, // Make it thinner to match material design
-                ),
-              ),
-            )
-            : IconButton(
-              icon: Icon(playerProvider.isPlaying ? Icons.pause : Icons.play_arrow),
-              onPressed: () {
-                if (playerProvider.isPlaying) {
-                  playerProvider.pause();
-                } else if (playerProvider.currentSreamUrl != null) {
-                  playerProvider.play();
-                }
-              },
-            ),
-            
+            // play/pause button
+            playerProvider.isLoading
+                ? const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.0,
+                      ),
+                    ),
+                  )
+                : IconButton(
+                    icon: Icon(playerProvider.isPlaying
+                      ? Icons.pause
+                      : Icons.play_arrow),
+                    onPressed: () {
+                      if (playerProvider.isPlaying) {
+                        playerProvider.pause();
+                      } else if (playerProvider.currentSreamUrl != null) {
+                        playerProvider.play();
+                      }
+                    },
+                  ),
             Expanded(
-              child: Text(
-                // we should probably create a map in the provider from a URL to a title to display.
-                // for now, I will assume that only the live could be playing, but this will have to adapt 
-                // once we implement on demand listening
-                playerProvider.isPlaying ? "Midtown Radio KW Live" : 'No stream selected',
-                overflow: TextOverflow.ellipsis,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Now Playing:",
+                    style: TextStyle(
+                      fontSize: 12,
+                    )
+                  ),
+                  Text(
+                    (playerProvider.currentSreamUrl != null)
+                        ? "Midtown Radio KW Live"
+                        : 'No stream selected',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
-          ]
-        )
-      ),
-    );
-  }
-
-    void _showPlayerSheet(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final safePadding = mediaQuery.viewPadding.top;
-    final screenHeight = mediaQuery.size.height;
-    
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: screenHeight * 0.9,
-        margin: EdgeInsets.only(top: safePadding + 10), // Extra 10 for breathing room
-        decoration:  BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SafeArea( // Additional protection
-          child: Column(
-            children: [
-              // Drag handle
-              Container(
-                margin: const EdgeInsets.only(top: 8, bottom: 8),
-                width: 40,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.grey[400],
-                  borderRadius: BorderRadius.circular(5),
-              ),),
-              Expanded(child: FullScreenPlayer()),
-            ],
-          ),
+          ],
         ),
       ),
     );
   }
-
 }

@@ -9,7 +9,7 @@ class FullScreenPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final playerProvider = Provider.of<PlayerProvider>(context);
-    final audioPlayer = playerProvider.playerService.player;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -26,15 +26,17 @@ class FullScreenPlayer extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Album/Radio art placeholder
                 Container(
                   width: 300,
                   height: 300,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: theme.scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.radio, size: 100),
+                  child: Image.asset('assets/images/logo_mic_black_on_white.png',
+                    fit: BoxFit.cover,
+                    height: 120,
+                  ),
                 ),
                 const SizedBox(height: 30),
                 const Text(
@@ -47,7 +49,7 @@ class FullScreenPlayer extends StatelessWidget {
             ),
           ),
 
-          // player controls
+          // play/pause
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
