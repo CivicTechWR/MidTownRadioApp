@@ -1,5 +1,29 @@
 import 'package:flutter/material.dart';
 
+class Episode {
+  final String title;
+  final String mediaSrc; 
+
+  Episode({
+    required this.title,
+    required this.mediaSrc,
+  });
+}
+
+class Show {
+  final String title;
+  final String desc;
+  final String imgUrl;
+  final List<Episode> episodes;
+
+  Show({
+    required this.title,
+    required this.desc,
+    required this.imgUrl,
+    required this.episodes,
+  });
+}  
+
 class OnDemandPage extends StatefulWidget {
   const OnDemandPage({super.key});
   static const routeName = '/on_demand';
