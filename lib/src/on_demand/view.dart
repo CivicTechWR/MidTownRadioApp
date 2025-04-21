@@ -90,13 +90,16 @@ class _ShowListState extends State<OnDemandPage> {
                     Row(children: [
                       Image.asset(show.imgUrl, width: 125,),
                       Expanded(
-                        child: Column(children: [
-                          Text(show.title,
+                        child: Center(
+                          child: Text(show.title,
                           style: Theme.of(context).textTheme.headlineSmall,),
-                          Text(show.desc)
-                        ],),
+                        ),
                       )
                     ],),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                      child: Text(show.desc),
+                    ),
                     ListView.builder(itemCount: show.episodes.length, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemBuilder: (context, index) {
                     final episode = show.episodes[index];
                     return Row(
