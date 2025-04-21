@@ -45,6 +45,10 @@ class OnDemandPage extends StatefulWidget {
 }
 
 class _ShowListState extends State<OnDemandPage> {
+
+  String currentMedia = "";
+  bool isPlaying = false;
+
   final List<Show> showList = [
     Show(title: "Test 1", desc: "The first of many", imgUrl: 'assets/images/logo_mic_black_on_white.png', episodes:[
       Episode(title: "Episode 1", mediaUrl: 'https://midtownradiokw.out.airtime.pro/midtownradiokw_a'),
@@ -62,16 +66,61 @@ class _ShowListState extends State<OnDemandPage> {
   Widget build(BuildContext context) {
     return ListView.builder(itemCount: showList.length, itemBuilder: (context, index) {
       final show = showList[index];
-      return Column(
-        children: [
-          Row(children: [
-            Image.asset(show.imgUrl, height: 100,),
-            Column(children: [
-              Text(show.title),
-              Text(show.desc)
-            ],)
-          ],),
-        ],
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+        child: Center(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              color: (Theme.of(context).brightness == Brightness.dark) ? Color.fromARGB(255, 49, 49, 49) : Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color:Colors.blueGrey,
+                  blurRadius: 3,
+                  offset: Offset(1, 1),
+                )
+              ]
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: 300,
+                child: Column(
+                  children: [
+                    Row(children: [
+                      Image.asset(show.imgUrl, width: 125,),
+                      Expanded(
+                        child: Column(children: [
+                          Text(show.title,
+                          style: Theme.of(context).textTheme.headlineSmall,),
+                          Text(show.desc)
+                        ],),
+                      )
+                    ],),
+                    ListView.builder(itemCount: show.episodes.length, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemBuilder: (context, index) {
+                    final episode = show.episodes[index];
+                    return Row(
+                      children: [
+                        IconButton(onPressed: ()=>{
+                          setState(() {
+                            if (currentMedia != episode.mediaUrl) {
+                              currentMedia = episode.mediaUrl;
+                              isPlaying = true;
+                            } else {
+                              isPlaying = !isPlaying;
+                            }
+                          })
+                        }, icon: Icon(((currentMedia == episode.mediaUrl) && isPlaying) ? Icons.pause : Icons.play_arrow)),
+                        Text(episode.title),
+                      ],
+                    );
+                  })
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       );
     });
   }
