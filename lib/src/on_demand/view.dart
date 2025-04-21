@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
 
 class Episode {
   final String title;
@@ -30,7 +32,6 @@ class OnDemandPage extends StatefulWidget {
   This widget will take 2 parameters: the array of shows from the api and the function to update the player. For now I'll just put somthing random in.
 
   final List<Show> showList;
-  final void Function(String mediaUrl) updatePlayer;
 
   const OnDemandPage({super.key, required this.showList, required this.updatePlayer});
 
@@ -64,6 +65,7 @@ class _ShowListState extends State<OnDemandPage> {
 
   @override
   Widget build(BuildContext context) {
+    final playerProvider = Provider.of<PlayerProvider>(context);
     return ListView.builder(itemCount: showList.length, itemBuilder: (context, index) {
       final show = showList[index];
       return Padding(
@@ -108,8 +110,15 @@ class _ShowListState extends State<OnDemandPage> {
                           setState(() {
                             if (currentMedia != episode.mediaUrl) {
                               currentMedia = episode.mediaUrl;
+                              playerProvider.setStream(episode.mediaUrl);
+                              playerProvider.play();
                               isPlaying = true;
                             } else {
+                              if (isPlaying) {
+                                playerProvider.pause();
+                              } else {
+                                playerProvider.play();
+                              }
                               isPlaying = !isPlaying;
                             }
                           })
