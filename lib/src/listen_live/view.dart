@@ -20,7 +20,9 @@ class ListenLivePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           ElevatedButton(
-            onPressed: () => playerProvider.setStream('https://midtownradiokw.out.airtime.pro/midtownradiokw_a'), 
+            onPressed: () => playerProvider.setStream(
+              url: 'https://midtownradiokw.out.airtime.pro/midtownradiokw_a'
+            ), 
             child: Icon(Icons.play_arrow, size: 100),
           ),
           // Icon(Icons.radio, size: 100),

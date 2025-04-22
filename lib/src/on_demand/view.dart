@@ -1,10 +1,15 @@
 /*
- Displays on demand shows/podcasts fetched from the RSS feed
+Displays on demand shows/podcasts fetched from the RSS feed
 for now, I am only fetching from the midtown-radio RSS feed 
 I see there are others for specific podcasts, and we should discuss which feed(s) to pull
 This works but all episodes of everything are just in one big long list, and we probably 
 want to make it easier for people to find follow ups to shows
 */
+
+// TODO:
+// For some reason here the theme does not fully switch on the container until I hot reload the page
+// Also picture asset is white background even in dark mode
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
@@ -145,7 +150,10 @@ class _OnDemandPageState extends State<OnDemandPage> {
                                   setState(() {
                                     if (currentMedia != episode.mediaUrl) {
                                       currentMedia = episode.mediaUrl;
-                                      playerProvider.setStream(episode.mediaUrl);
+                                      playerProvider.setStream(
+                                        url: episode.mediaUrl,
+                                        title: episode.title
+                                      );
                                       playerProvider.play();
                                     } else {
                                       if (playerProvider.isPlaying) {

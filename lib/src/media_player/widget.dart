@@ -72,9 +72,7 @@ class PlayerWidget extends StatelessWidget {
                   )
                 ),
                 Text(
-                  (playerProvider.currentSreamUrl != null)
-                      ? "Midtown Radio KW Live"
-                      : 'No stream selected',
+                  playerProvider.titleCurrentlyPlaying,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],

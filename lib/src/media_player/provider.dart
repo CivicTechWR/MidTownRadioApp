@@ -3,18 +3,29 @@ import 'package:ctwr_midtown_radio_app/src/media_player/service.dart';
 
 class PlayerProvider extends ChangeNotifier {
   final PlayerService _playerService;
+
+  // string to display when playing
+  String _titleCurrentlyPlaying = "Midtown Radio KW";
+
   bool _isLoading = false;
 
   PlayerProvider(this._playerService);
 
   String? get currentSreamUrl => _playerService.currentStreamUrl;
-  
   bool get isPlaying => _playerService.player.playing;
   bool get isLoading => _isLoading;
+
+  String get titleCurrentlyPlaying => _titleCurrentlyPlaying;
+
+  set titleCurrentlyPlaying(String newTitle){
+    _titleCurrentlyPlaying == newTitle;
+    notifyListeners();
+  }
   
 
-  Future<void> setStream(String url) async {
+  Future<void> setStream({required String url, String? title}) async {
     _isLoading = true;
+    _titleCurrentlyPlaying = title ?? "Midtown Radio KW";
     notifyListeners();
 
     await _playerService.setStream(url);
