@@ -48,7 +48,6 @@ class OnDemandPage extends StatefulWidget {
 class _ShowListState extends State<OnDemandPage> {
 
   String currentMedia = "";
-  bool isPlaying = false;
 
   final List<Show> showList = [
     Show(title: "Test 1", desc: "The first of many", imgUrl: 'assets/images/logo_mic_black_on_white.png', episodes:[
@@ -112,17 +111,15 @@ class _ShowListState extends State<OnDemandPage> {
                               currentMedia = episode.mediaUrl;
                               playerProvider.setStream(episode.mediaUrl);
                               playerProvider.play();
-                              isPlaying = true;
                             } else {
-                              if (isPlaying) {
+                              if (playerProvider.isPlaying) {
                                 playerProvider.pause();
                               } else {
                                 playerProvider.play();
                               }
-                              isPlaying = !isPlaying;
                             }
                           })
-                        }, icon: Icon(((currentMedia == episode.mediaUrl) && isPlaying) ? Icons.pause : Icons.play_arrow)),
+                        }, icon: Icon(((currentMedia == episode.mediaUrl) && playerProvider.isPlaying) ? Icons.pause : Icons.play_arrow)),
                         Text(episode.title),
                       ],
                     );
