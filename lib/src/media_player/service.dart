@@ -25,13 +25,16 @@ class PlayerService {
   }
 
   Future<void> setStream(String url) async {
+
     if (_currentStreamUrl == url) return;
 
     try {
+
       // if (await session.setActive(true)) {
         _currentStreamUrl = url;
         await _audioPlayer.setUrl(url);
-        await _audioPlayer.play();
+        _audioPlayer.play();
+
       // }
     } catch (e) {
       _currentStreamUrl = null;

@@ -41,6 +41,8 @@ dependencies:
   just_audio: ^0.9.46
   audio_session: ^0.1.25
   intl: any
+  http: ^1.3.0
+  dart_rss: ^3.0.3
 
 dev_dependencies:
   flutter_test:

@@ -2,12 +2,15 @@ import 'package:ctwr_midtown_radio_app/src/settings/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
+import 'package:provider/provider.dart';
+import 'package:ctwr_midtown_radio_app/src/media_player/widget.dart'; 
+import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
 import 'package:ctwr_midtown_radio_app/src/settings/view.dart';
 import 'package:ctwr_midtown_radio_app/src/error/view.dart';
 import 'package:ctwr_midtown_radio_app/src/home/view.dart';
 import 'package:ctwr_midtown_radio_app/src/listen_live/view.dart';
 import 'package:ctwr_midtown_radio_app/src/on_demand/view.dart';
+
 
 class MidtownRadioApp extends StatelessWidget {
   const MidtownRadioApp({
@@ -25,9 +28,9 @@ class MidtownRadioApp extends StatelessWidget {
 
 class MidtownRadioStateful extends StatefulWidget {
   const MidtownRadioStateful({
-    Key? key,
+    super.key,
     required this.settingsController
-  }): super(key: key);
+  });
 
   final SettingsController settingsController;
 
@@ -36,6 +39,8 @@ class MidtownRadioStateful extends StatefulWidget {
 }
 
 class MidtownRadioState extends State<MidtownRadioStateful> {
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
+
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +48,20 @@ class MidtownRadioState extends State<MidtownRadioStateful> {
       listenable: widget.settingsController,
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
+
+          builder: (context, child) => Scaffold(
+            body: child,
+            bottomSheet: Consumer<PlayerProvider>(
+              builder: (context, player, _) {
+                // displays bottom only if music is playing and not full screen view
+                return (player.currentSreamUrl != null)
+                    ? PlayerWidget(navigatorKey: navigatorKey)
+                    : const SizedBox.shrink();
+              },
+            ),
+          ),
+
           initialRoute: HomePage.routeName,
 
           localizationsDelegates: const [
