@@ -44,7 +44,7 @@ class _OnDemandPageState extends State<OnDemandPage> {
   void _loadShow() {
     setState(() {
       _isLoading = true;
-      _showFuture = RssService.fetchShow();
+      _showFuture = RssService.fetchMidtownRadioShow();
       _showFuture.then((show) {
         setState(() {
           _show = show;
