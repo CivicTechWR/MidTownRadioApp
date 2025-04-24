@@ -19,14 +19,18 @@ class HomePage extends StatelessWidget {
         body: Column(
           children: [
             const TabBar(
+              labelColor: Color.fromRGBO(23, 204, 204, 0.867),
+              indicatorColor: Colors.white,
               tabs: [
                 Tab(
-                  icon: Icon(Icons.radio),
-                  text: 'Listen Live'
+                  child: Text("LISTEN LIVE",
+                  style: TextStyle(fontSize: 18,fontWeight: FontWeight.w900),
+                  ),
                 ),
                 Tab(
-                  icon: Icon(Icons.podcasts),
-                  text: 'On Demand'
+                  child: Text("ON DEMAND",
+                  style: TextStyle(fontSize: 18,fontWeight: FontWeight.w900),
+                  ),
                 ),
               ],
             ),
