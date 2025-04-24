@@ -12,9 +12,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Theme.of(context).brightness == Brightness.dark
-      ? Image.asset('assets/images/logo_mic_black_on_white.png',
+      ? Image.asset('assets/images/logo_main.png',
         fit: BoxFit.cover,
-        height: 60,
+        height: 120,
       )
       : Image.asset('assets/images/logo_main.png',
         fit: BoxFit.cover,
