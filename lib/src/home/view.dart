@@ -18,19 +18,39 @@ class HomePage extends StatelessWidget {
         drawer: const MainAppDrawer(),
         body: Column(
           children: [
-            const TabBar(
-              labelColor: Color.fromRGBO(23, 204, 204, 0.867),
-              indicatorColor: Colors.white,
-              tabs: [
-                Tab(
-                  child: Text("LISTEN LIVE",
-                  style: TextStyle(fontSize: 18,fontWeight: FontWeight.w900),
+            Stack(
+              children: [
+                SizedBox(
+                  height: 50,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: List<Widget>.filled(1 /* The Number of Tabs */, Expanded(
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFf05959),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),),
                   ),
                 ),
-                Tab(
-                  child: Text("ON DEMAND",
-                  style: TextStyle(fontSize: 18,fontWeight: FontWeight.w900),
-                  ),
+                const TabBar(
+                  labelColor: Color.fromRGBO(23, 204, 204, 0.867),
+                  indicatorColor: Colors.white,
+                  tabs: [
+                    Tab(
+                      child: Text("LISTEN LIVE",
+                      style: TextStyle(fontSize: 18,fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                    Tab(
+                      child: Text("ON DEMAND",
+                      style: TextStyle(fontSize: 18,fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
