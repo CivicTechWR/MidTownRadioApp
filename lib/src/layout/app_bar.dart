@@ -11,23 +11,16 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Theme.of(context).brightness == Brightness.dark
-      ? Image.asset('assets/images/logo_main.png',
+      title: Image.asset('assets/images/logo_main.png',
         fit: BoxFit.cover,
-        height: 120,
-      )
-      : Image.asset('assets/images/logo_main.png',
-        fit: BoxFit.cover,
-        height: 120,
+        height: 55,
       ),
       centerTitle: true,
       actions: [
-        IconButton(
-          icon: const Icon(Icons.settings),
-          onPressed: () {
-            Navigator.pushNamed(context, SettingsPage.routeName);
-          },
-        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: Image.asset("assets/images/hashtag-local-af.png", height: 18,),
+        )
       ],
     );
   }
