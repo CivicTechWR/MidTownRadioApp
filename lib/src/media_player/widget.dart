@@ -14,7 +14,7 @@ class PlayerWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: (Theme.of(context).brightness == Brightness.dark) ? Colors.black:Colors.grey[200],
         border: Border(top: BorderSide(color: Colors.grey[300]!)),
       ),
       child: Row(
