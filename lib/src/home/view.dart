@@ -36,9 +36,9 @@ class HomePage extends StatelessWidget {
                       ),),
                   ),
                 ),
-                const TabBar(
+                TabBar(
                   labelColor: Color.fromRGBO(23, 204, 204, 0.867),
-                  indicatorColor: Colors.white,
+                  indicatorColor: (Theme.of(context).brightness == Brightness.dark) ? Colors.white:Colors.black,
                   tabs: [
                     Tab(
                       child: Text("LISTEN LIVE",
