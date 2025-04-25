@@ -54,14 +54,8 @@ class ListenLivePage extends StatelessWidget {
                 // PlayerWidget(),
                 // SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                  child: Text(
-                    'Live Listening',
-                    style: TextStyle(
-                      color: Color(0xfff05959),
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,),
-                  ),
+                  padding: const EdgeInsets.only(top:20),
+                  child: Image.asset('assets/images/we-play-local-music.png', width: 300,),
                 ),
                 SizedBox(height: 10)
               ],
