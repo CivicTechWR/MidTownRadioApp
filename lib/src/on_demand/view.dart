@@ -128,144 +128,122 @@ class _OnDemandPageState extends State<OnDemandPage> {
     return Padding(
         padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
         child: Center(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              color: (Theme.of(context).brightness == Brightness.dark)
-                  ? const Color.fromARGB(255, 49, 49, 49)
-                  : Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blueGrey,
-                  blurRadius: 3,
-                  offset: const Offset(1, 1),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                width: 300,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        show.imgUrl.startsWith('http')
-                            ? Image.network(show.imgUrl, width: 125)
-                            : Image.asset(show.imgUrl, width: 125),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              show.title,
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 300,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right:5),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xfff05959),width: 7),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: Color(0xfff05959)),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            child: show.imgUrl.startsWith('http')
+                                ? Image.network(show.imgUrl, width: 125)
+                                : Image.asset(show.imgUrl, width: 125),
                           ),
-                        )
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                      child: Text(show.desc),
-                    ),
-                    
-                    // Episode list with fade effect
-                    Stack(
-                      children: [
-                        ListView.builder(
-                          itemCount: episodesToShow.length,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            final episode = episodesToShow[index];
-                            return Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      if (currentMedia != episode.mediaUrl) {
-                                        currentMedia = episode.mediaUrl;
-                                        playerProvider.setStream(
-                                          url: episode.mediaUrl,
-                                          title: episode.title,
-                                        );
-                                        playerProvider.play();
-                                      } else {
-                                        if (playerProvider.isPlaying) {
-                                          playerProvider.pause();
-                                        } else {
-                                          playerProvider.play();
-                                        }
-                                      }
-                                    });
-                                  },
-                                  icon: Icon(
-                                    ((currentMedia == episode.mediaUrl) &&
-                                            playerProvider.isPlaying)
-                                        ? Icons.pause
-                                        : Icons.play_arrow,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(episode.title),
-                                      if (episode.publishDate != null)
-                                        Text(
-                                          formatDate(episode.publishDate!.toLocal()),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall,
-                                        ),
-                                      Divider(),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-
-                        // Fade effect when not expanded
-                        if (!_showAllEpisodesMap[show.title]! && show.episodes.length > 5)
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            height: 60,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    (Theme.of(context).brightness == Brightness.dark)
-                                      ? const Color.fromARGB(64, 49, 49, 49)
-                                      : Colors.white.withAlpha(64),
-                                    (Theme.of(context).brightness == Brightness.dark)
-                                      ? const Color.fromARGB(255, 49, 49, 49)
-                                      : Colors.white,
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    // Show More/Less button
-                    if (show.episodes.length > 5)
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _showAllEpisodesMap[show.title] = !_showAllEpisodesMap[show.title]!;
-                          });
-                        },
-                        child: Text(
-                          (_showAllEpisodesMap[show.title] ?? false) ? 'Show Less' : 'Show More',
                         ),
                       ),
-                  ],
-                ),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            show.title,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 20, color: Color(0xff33cccc), fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+                    child: Text(show.desc, style: TextStyle(color: Color(0xff33cccc),fontWeight: FontWeight.bold),),
+                  ),
+                  
+                  // Episode list with fade effect
+                  ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return LinearGradient(
+                        colors: [Colors.transparent,(Theme.of(context).brightness == Brightness.dark) ? Colors.white:Colors.black],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.center).createShader(bounds);
+                    },
+                    child: ListView.builder(
+                      itemCount: episodesToShow.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final episode = episodesToShow[index];
+                        return Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (currentMedia != episode.mediaUrl) {
+                                    currentMedia = episode.mediaUrl;
+                                    playerProvider.setStream(
+                                      url: episode.mediaUrl,
+                                      title: episode.title,
+                                    );
+                                    playerProvider.play();
+                                  } else {
+                                    if (playerProvider.isPlaying) {
+                                      playerProvider.pause();
+                                    } else {
+                                      playerProvider.play();
+                                    }
+                                  }
+                                });
+                              },
+                              icon: Icon(
+                                ((currentMedia == episode.mediaUrl) &&
+                                        playerProvider.isPlaying)
+                                    ? Icons.pause
+                                    : Icons.play_arrow,
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(episode.title),
+                                  if (episode.publishDate != null)
+                                    Text(
+                                      formatDate(episode.publishDate!.toLocal()),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall,
+                                    ),
+                                  Divider(),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  // Show More/Less button
+                  if (show.episodes.length > 5)
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _showAllEpisodesMap[show.title] = !_showAllEpisodesMap[show.title]!;
+                        });
+                      },
+                      child: Text(
+                        (_showAllEpisodesMap[show.title] ?? false) ? 'Show Less' : 'Show More',
+                        style: TextStyle(color: Color(0xfff05959)),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
