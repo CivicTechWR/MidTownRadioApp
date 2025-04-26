@@ -13,10 +13,7 @@ want to make it easier for people to find follow ups to shows
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
-import 'package:ctwr_midtown_radio_app/src/media_player/podcasts.dart';
-import 'package:ctwr_midtown_radio_app/src/media_player/on_demand_fetcher.dart';
-import 'package:ctwr_midtown_radio_app/src/media_player/date_formatting.dart';
-
+import 'package:ctwr_midtown_radio_app/src/on_demand/service.dart';
 
 class OnDemandPage extends StatefulWidget {
   const OnDemandPage({super.key});
@@ -28,248 +25,71 @@ class OnDemandPage extends StatefulWidget {
 }
 
 class _OnDemandPageState extends State<OnDemandPage> {
-  String currentMedia = "";
-  List<Future<Show?>> _showFuture = [];
-  bool _isLoading = true;
-  List<Show>? _shows;
-  Map<String, bool> _showAllEpisodesMap = {};
-
-
-  // Loads shows from RSS to display
-  @override
-  void initState() {
-    super.initState();
-    _loadShows();
-  }
-
-  // Gets shows from RSS feed
-  Future<void> _loadShows() async {
-    setState(() {
-      _isLoading = true;
-      _shows = null;
-      _showAllEpisodesMap = {}; 
-    });
-
-    // Create a list of futures, attempting to fetch each show
-    _showFuture.add(RssService.fetchMakingsOfAScene());
-    _showFuture.add(RssService.fetchMidtownConversations());
-    _showFuture.add(RssService.fetchOnTheScene());
-    _showFuture.add(RssService.fetchMidtownRadioShow());
-
-    try {
-      // Waits for all shows to fetch
-      final List<Show?> results = await Future.wait(_showFuture);
-
-      // Filter out the nulls (failed fetches) and keep the successful Show objects
-      final List<Show> successfulShows = results.whereType<Show>().toList();
-
-      if (!mounted) return;
-
-      // Update shows with newly loaded shows
-      setState(() {
-        _shows = successfulShows;
-        // Initialize the expansion map  to false for the successfully loaded shows
-        for (var show in _shows!) {
-          _showAllEpisodesMap[show.title] = false;
-        }
-
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _shows = [];
-      });
-      debugPrint('Unexpected error in loading shows: $e');
-    }
-  }
+  final OnDemand onDemand = OnDemand();
 
   @override
   Widget build(BuildContext context) {
     final playerProvider = Provider.of<PlayerProvider>(context);
-
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_shows == null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Failed to load podcast episodes'),
-            TextButton(
-              onPressed: _loadShows,
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: _shows!.length,
-      itemBuilder: (context, index) {
-        // Extracted logic/UI into its own method for each show
-        return _showBuilder(context, _shows![index], playerProvider);
+    double imageSize = 100;
+    return FutureBuilder(
+      future: onDemand.fetchPodcasts(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Center(child: Text('Error fetching shows'));
+        } else if (onDemand.podcasts.isEmpty) {
+          return const Center(child: Text('No shows available'));
+        } else {
+          return ListView.builder(
+            itemCount: onDemand.episodes.length,
+            itemBuilder: (context, index) {
+              final Episode show = onDemand.episodes[index];
+              return ListTile(
+                leading: Image.network(
+                  show.imageUrl,
+                  width: imageSize,
+                  height: imageSize,
+                  fit: BoxFit.cover,
+                ),
+                title: Text(show.title),
+                subtitle: Text(show.description),
+                onTap: () => playerProvider.setStream(show.streamUrl),
+              );
+            },
+          );
+        }
       },
     );
   }
+}
 
-  Padding _showBuilder(BuildContext context, Show show, PlayerProvider playerProvider) {
+class OnDemandListTile extends StatelessWidget {
+  OnDemandListTile({
+    super.key,
+    required this.podcastName,
+    required this.podcastImageUrl,
+    required this.podcastEpisodeName,
+    required this.podcastEpisodeDate,
+    required this.podcastEpisodeStreamUrl,
+  });
 
-    // Manage expansion state - show 5 shows and let user expand
-    final episodesToShow = (_showAllEpisodesMap[show.title] ?? false)
-        ? show.episodes 
-        : show.episodes.take(3).toList();
+  final String podcastName;
+  final String podcastImageUrl;
+  final String podcastEpisodeName;
+  final String podcastEpisodeDate;
+  final String podcastEpisodeStreamUrl;
 
+  final playerProvider = Provider.of<PlayerProvider>(context);
 
-    return Padding(
-        padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-        child: Center(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              color: (Theme.of(context).brightness == Brightness.dark)
-                  ? const Color.fromARGB(255, 49, 49, 49)
-                  : Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blueGrey,
-                  blurRadius: 3,
-                  offset: const Offset(1, 1),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                width: 300,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        show.imgUrl.startsWith('http')
-                            ? Image.network(show.imgUrl, width: 125)
-                            : Image.asset(show.imgUrl, width: 125),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              show.title,
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                      child: Text(show.desc),
-                    ),
-                    
-                    // Episode list with fade effect
-                    Stack(
-                      children: [
-                        ListView.builder(
-                          itemCount: episodesToShow.length,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            final episode = episodesToShow[index];
-                            return Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      if (currentMedia != episode.mediaUrl) {
-                                        currentMedia = episode.mediaUrl;
-                                        playerProvider.setStream(
-                                          url: episode.mediaUrl,
-                                          title: episode.title,
-                                        );
-                                        playerProvider.play();
-                                      } else {
-                                        if (playerProvider.isPlaying) {
-                                          playerProvider.pause();
-                                        } else {
-                                          playerProvider.play();
-                                        }
-                                      }
-                                    });
-                                  },
-                                  icon: Icon(
-                                    ((currentMedia == episode.mediaUrl) &&
-                                            playerProvider.isPlaying)
-                                        ? Icons.pause
-                                        : Icons.play_arrow,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(episode.title),
-                                      if (episode.publishDate != null)
-                                        Text(
-                                          formatDate(episode.publishDate!.toLocal()),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall,
-                                        ),
-                                      Divider(),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-
-                        // Fade effect when not expanded
-                        if (!_showAllEpisodesMap[show.title]! && show.episodes.length > 5)
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            height: 60,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    (Theme.of(context).brightness == Brightness.dark)
-                                      ? const Color.fromARGB(64, 49, 49, 49)
-                                      : Colors.white.withAlpha(64),
-                                    (Theme.of(context).brightness == Brightness.dark)
-                                      ? const Color.fromARGB(255, 49, 49, 49)
-                                      : Colors.white,
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    // Show More/Less button
-                    if (show.episodes.length > 5)
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _showAllEpisodesMap[show.title] = !_showAllEpisodesMap[show.title]!;
-                          });
-                        },
-                        child: Text(
-                          (_showAllEpisodesMap[show.title] ?? false) ? 'Show Less' : 'Show More',
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Image.network(podcastImageUrl),
+      title: Text(podcastName),
+      subtitle: Text(podcastEpisodeName),
+      // trailing: ,
+      onTap: () => playerProvider.setStream(podcastEpisodeStreamUrl),
+    );
   }
 }
