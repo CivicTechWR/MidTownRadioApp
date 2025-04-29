@@ -1,19 +1,7 @@
-/*
-Displays on demand shows/podcasts fetched from the RSS feed
-for now, I am only fetching from the midtown-radio RSS feed 
-I see there are others for specific podcasts, and we should discuss which feed(s) to pull
-This works but all episodes of everything are just in one big long list, and we probably 
-want to make it easier for people to find follow ups to shows
-*/
-
-// TODO:
-// For some reason here the theme does not fully switch on the container until I hot reload the page
-// Also picture asset is white background even in dark mode
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
-import 'package:ctwr_midtown_radio_app/src/on_demand/service.dart';
+import 'package:ctwr_midtown_radio_app/src/on_demand/controller.dart';
 
 class OnDemandPage extends StatefulWidget {
   const OnDemandPage({super.key});
@@ -25,54 +13,99 @@ class OnDemandPage extends StatefulWidget {
 }
 
 class _OnDemandPageState extends State<OnDemandPage> {
-  final OnDemand onDemand = OnDemand();
+  late Future<OnDemand> onDemandFuture;
+
+  List<String> filters = ['All'];
+  late String selectedFilter;
+  // late Future<void> fetchFuture; // Store the Future for FutureBuilder
+
+  @override
+  void initState() {
+    super.initState();
+    onDemandFuture = OnDemand.create();
+    selectedFilter = filters[0];
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final playerProvider = Provider.of<PlayerProvider>(context);
-    double imageSize = 100;
-    return FutureBuilder(
-      future: onDemand.fetchPodcasts(),
+    return
+        // Column(
+        //   children: [
+        FutureBuilder(
+      future: onDemandFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return const Center(child: Text('Error fetching shows'));
-        } else if (onDemand.podcasts.isEmpty) {
+        } else if (!snapshot.hasData) {
           return const Center(child: Text('No shows available'));
         } else {
-          return ListView.builder(
-            itemCount: onDemand.episodes.length,
-            itemBuilder: (context, index) {
-              final Episode show = onDemand.episodes[index];
-              return ListTile(
-                leading: Image.network(
-                  show.imageUrl,
-                  width: imageSize,
-                  height: imageSize,
-                  fit: BoxFit.cover,
-                ),
-                title: Text(show.title),
-                subtitle: Text(show.description),
-                onTap: () => playerProvider.setStream(show.streamUrl),
-              );
-            },
-          );
+          final onDemand = snapshot.data!;
+          filters = [
+            'All',
+            ...onDemand.episodes.map((e) => e.podcastName).toSet()
+          ];
+          final filteredEpisodes = selectedFilter == filters[0]
+              ? onDemand.episodes
+              : onDemand.episodes
+                  .where((episode) => episode.podcastName == selectedFilter)
+                  .toList();
+
+          return Column(children: [
+            DropdownButton<String>(
+              value: selectedFilter, // Set the current value
+              items: filters.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newSelectedFilter) {
+                if (newSelectedFilter != null) {
+                  setState(() {
+                    selectedFilter = newSelectedFilter;
+                  });
+                }
+              },
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredEpisodes.length,
+                itemBuilder: (context, index) {
+                  final Episode show = filteredEpisodes[index];
+                  return _OnDemandListTile(
+                    podcastName: show.podcastName,
+                    podcastImageUrl: show.podcastImageUrl,
+                    podcastEpisodeName: show.episodeName,
+                    podcastEpisodeDate: show.episodeDate,
+                    podcastEpisodeStreamUrl: show.episodeStreamUrl,
+                  );
+                },
+              ),
+            )
+          ]);
         }
       },
     );
   }
 }
 
-class OnDemandListTile extends StatelessWidget {
-  OnDemandListTile({
-    super.key,
+class _OnDemandListTile extends StatelessWidget {
+  // ignore: use_super_parameters
+  const _OnDemandListTile({
+    Key? key,
     required this.podcastName,
     required this.podcastImageUrl,
     required this.podcastEpisodeName,
     required this.podcastEpisodeDate,
     required this.podcastEpisodeStreamUrl,
-  });
+  }):super(key: key);
 
   final String podcastName;
   final String podcastImageUrl;
@@ -80,16 +113,32 @@ class OnDemandListTile extends StatelessWidget {
   final String podcastEpisodeDate;
   final String podcastEpisodeStreamUrl;
 
-  final playerProvider = Provider.of<PlayerProvider>(context);
-
   @override
   Widget build(BuildContext context) {
+    final playerProvider = Provider.of<PlayerProvider>(context);
     return ListTile(
       leading: Image.network(podcastImageUrl),
-      title: Text(podcastName),
-      subtitle: Text(podcastEpisodeName),
-      // trailing: ,
-      onTap: () => playerProvider.setStream(podcastEpisodeStreamUrl),
+      title: Text(
+        podcastEpisodeName,
+        maxLines: 1,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(podcastName),
+          Text(podcastEpisodeDate),
+        ],
+      ),
+      selected: playerProvider.currentSreamUrl ==
+          podcastEpisodeStreamUrl, // Fixed typo
+      selectedTileColor: Theme.of(context).highlightColor,
+      onTap: () => playerProvider.setStream(
+        url: podcastEpisodeStreamUrl,
+        title: podcastEpisodeName,
+      ),
     );
   }
 }
