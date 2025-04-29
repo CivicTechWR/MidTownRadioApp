@@ -153,11 +153,11 @@ class _OnDemandListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onDemand = Provider.of<OnDemand>(context, listen: false);
-    final cachedImage = onDemand.getCachedImage(podcastName);
+    // final onDemand = Provider.of<OnDemand>(context, listen: false);
+    // final cachedImage = onDemand.getCachedImage(podcastName);
     final playerProvider = Provider.of<PlayerProvider>(context);
     return ListTile(
-      leading: cachedImage != null ? Image.memory(cachedImage) : Image.network(podcastImageUrl),
+      leading: Image.network(podcastImageUrl), // cachedImage != null ? Image.memory(cachedImage) : Image.network(podcastImageUrl),
       title: Text(
         podcastEpisodeName,
         maxLines: 1,
