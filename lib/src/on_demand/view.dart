@@ -17,17 +17,44 @@ class _OnDemandPageState extends State<OnDemandPage> {
 
   List<String> filters = ['All'];
   late String selectedFilter;
-  // late Future<void> fetchFuture; // Store the Future for FutureBuilder
+
+  // List<Episode> _displayedEpisodes = [];
+  int itemsToLoad = 10;
+  bool isLoadingMore = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     onDemandFuture = OnDemand.create();
     selectedFilter = filters[0];
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          !isLoadingMore) {
+        _loadMoreEpisodes();
+      }
+    });
+  }
+
+  void _loadMoreEpisodes() {
+    setState(() {
+      (() {
+        isLoadingMore = true;
+      });
+    });
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      setState(() {
+        itemsToLoad += 10;
+        isLoadingMore = false;
+      });
+    });
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -70,14 +97,25 @@ class _OnDemandPageState extends State<OnDemandPage> {
                 if (newSelectedFilter != null) {
                   setState(() {
                     selectedFilter = newSelectedFilter;
+                    itemsToLoad = 10;
                   });
                 }
               },
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: filteredEpisodes.length,
+                controller: _scrollController,
+                itemCount: filteredEpisodes.take(itemsToLoad).length +
+                    (!isLoadingMore ? 1 : 0),
                 itemBuilder: (context, index) {
+                  if (index == itemsToLoad && isLoadingMore) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (index >= filteredEpisodes.length) {
+                    return const SizedBox.shrink();
+                  }
+
                   final Episode show = filteredEpisodes[index];
                   return _OnDemandListTile(
                     podcastName: show.podcastName,
@@ -105,7 +143,7 @@ class _OnDemandListTile extends StatelessWidget {
     required this.podcastEpisodeName,
     required this.podcastEpisodeDate,
     required this.podcastEpisodeStreamUrl,
-  }):super(key: key);
+  }) : super(key: key);
 
   final String podcastName;
   final String podcastImageUrl;
@@ -115,9 +153,11 @@ class _OnDemandListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onDemand = Provider.of<OnDemand>(context, listen: false);
+    final cachedImage = onDemand.getCachedImage(podcastName);
     final playerProvider = Provider.of<PlayerProvider>(context);
     return ListTile(
-      leading: Image.network(podcastImageUrl),
+      leading: cachedImage != null ? Image.memory(cachedImage) : Image.network(podcastImageUrl),
       title: Text(
         podcastEpisodeName,
         maxLines: 1,
