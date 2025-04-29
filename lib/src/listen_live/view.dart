@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ctwr_midtown_radio_app/src/media_player/widget.dart';
-// import 'package:ctwr_midtown_radio_app/src/media_player/service.dart';
-import 'package:ctwr_midtown_radio_app/main.dart';
 import 'package:provider/provider.dart';
 import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
 
@@ -33,6 +30,7 @@ class ListenLivePage extends StatelessWidget {
             style: TextStyle(
               fontSize: 34,
               fontWeight: FontWeight.bold,),
+            maxLines: 1,
           ),
           SizedBox(height: 10),
           //PlayerWidget()

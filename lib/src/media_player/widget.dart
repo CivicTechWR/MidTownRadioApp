@@ -10,8 +10,6 @@ class PlayerWidget extends StatelessWidget {
     required this.navigatorKey
   });
 
-  // if user taps on bottom control bar, this gets called and fullscreen pops up
-  
   @override
   Widget build(BuildContext context) {
     final playerProvider = Provider.of<PlayerProvider>(context);

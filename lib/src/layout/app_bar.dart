@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ctwr_midtown_radio_app/src/layout/drawer.dart';
 
 import 'package:ctwr_midtown_radio_app/src/settings/view.dart';
 
@@ -15,6 +14,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       ? Image.asset('assets/images/logo_mic_black_on_white.png',
         fit: BoxFit.cover,
         height: 60,
+
       )
       : Image.asset('assets/images/logo_main.png',
         fit: BoxFit.cover,
