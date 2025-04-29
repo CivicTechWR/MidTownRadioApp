@@ -6,14 +6,30 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+
+import 'package:provider/provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:ctwr_midtown_radio_app/main.dart';
+// import 'package:ctwr_midtown_radio_app/main.dart';
+import 'package:ctwr_midtown_radio_app/src/app.dart';
+import 'package:ctwr_midtown_radio_app/src/settings/controller.dart';
+import 'package:ctwr_midtown_radio_app/src/settings/service.dart';
+
+import 'package:ctwr_midtown_radio_app/src/media_player/service.dart';
+import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    final settingsController = SettingsController(SettingsService());
+
+    final playerService = PlayerService();
+    await playerService.init();
+    settingsController.loadSettings();
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(ChangeNotifierProvider(
+        create: (_) => PlayerProvider(playerService),
+        child: MidtownRadioApp(settingsController: settingsController)));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
