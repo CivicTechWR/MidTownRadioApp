@@ -147,13 +147,16 @@ We could maybe discuss persisting any newly found URL's onto the users device us
 We also might as well update the hardcoded list anytime we would have had to push an update anyways for another reason - but I think theres no point to making an update solely to update the list.
 
 Currently for testing, the file is on GitHub, but the plan is that it is on the existing Wix website for easy updating and more centralization.
+
+One last thing to consider -- since we are fetching the RSS URLS and then the feeds themselves, the fetch is a bit slower.
+To mitigate this, the getStreams could (and maybe should) run as soon as the app opens, and then cache the URL's
 */
 class _Streams {
 
   // This is the URL to the text file with updated RSS feeds
   // currently on GitHub -- TODO: move to Wix
   static const String feedsUrl = 
-    'https://raw.githubusercontent.com/USERNAME/REPO/main/feeds.txt';
+    'https://raw.githubusercontent.com/CivicTechWR/MidtownRadioApp/cw-dynamic-feeds/assets/tempfeeds.txt';
 
   // Hardcoded list - exists if for some reason new feeds can't fetch.
   static const  List<String> _fallback = [
@@ -166,6 +169,7 @@ class _Streams {
   // Get union of fallback and new loaded RSS URL's
   static Future<List<String>> getStreams() async {
     try {
+      //debugPrint("fetching rss feeds from source...");
       final resp = await http.get(Uri.parse(feedsUrl));
       if (resp.statusCode != 200) throw Exception();
 
