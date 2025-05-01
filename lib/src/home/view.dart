@@ -37,7 +37,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 TabBar(
-                  labelColor: Color.fromRGBO(23, 204, 204, 0.867),
+                  labelColor: (Theme.of(context).brightness == Brightness.dark) ?Color.fromRGBO(23, 204, 204, 1):Color(0xff00989d),
                   indicatorColor: (Theme.of(context).brightness == Brightness.dark) ? Colors.white:Colors.black,
                   tabs: [
                     Tab(
