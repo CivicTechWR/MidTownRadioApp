@@ -52,7 +52,9 @@ class MidtownRadioState extends State<MidtownRadioStateful> {
 
           builder: (context, child) => Scaffold(
             body: child,
-            bottomSheet: Consumer<PlayerProvider>(
+
+            // Changed to nav bar so that body contents don't end up behind it
+            bottomNavigationBar: Consumer<PlayerProvider>(
               builder: (context, player, _) {
                 // displays bottom only if music is playing and not full screen view
                 return (player.currentSreamUrl != null)

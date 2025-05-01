@@ -21,6 +21,7 @@ class _OnDemandPageState extends State<OnDemandPage> {
   // List<Episode> _displayedEpisodes = [];
   int itemsToLoad = 10;
   bool isLoadingMore = false;
+  bool _showBackToTop = false;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -29,8 +30,20 @@ class _OnDemandPageState extends State<OnDemandPage> {
     onDemandFuture = OnDemand.create();
     selectedFilter = filters[0];
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-              _scrollController.position.maxScrollExtent &&
+      // This logic determines whether or not to show the "back to top" button
+      final bool shouldShow = _scrollController.offset > 100;
+      // Only call setState if the state needs to change
+        if (shouldShow != _showBackToTop) {
+          setState(() {
+            _showBackToTop = shouldShow;
+          });
+        }
+
+      // If we are 200 pixels from the bottom, start loading more if were not already
+      // I find this makes the UX much better than if we have to get to the very bottom to start loading, and has minimal performance cost
+      // ^ very rarely does the user even see the loading icon, scrolling at a reasonable speed 
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 200  &&
           !isLoadingMore) {
         _loadMoreEpisodes();
       }
@@ -39,9 +52,9 @@ class _OnDemandPageState extends State<OnDemandPage> {
 
   void _loadMoreEpisodes() {
     setState(() {
-      (() {
+      //(() {
         isLoadingMore = true;
-      });
+      //});
     });
 
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -63,77 +76,101 @@ class _OnDemandPageState extends State<OnDemandPage> {
     return
         // Column(
         //   children: [
-        FutureBuilder(
-      future: onDemandFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Error fetching shows'));
-        } else if (!snapshot.hasData) {
-          return const Center(child: Text('No shows available'));
-        } else {
-          final onDemand = snapshot.data!;
-          filters = [
-            'All',
-            ...onDemand.episodes.map((e) => e.podcastName).toSet()
-          ];
-          final filteredEpisodes = selectedFilter == filters[0]
-              ? onDemand.episodes
-              : onDemand.episodes
-                  .where((episode) => episode.podcastName == selectedFilter)
-                  .toList();
 
-          return Column(children: [
-            DropdownButton<String>(
-              value: selectedFilter, // Set the current value
-              items: filters.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
+        // I use the scaffold to allow body and then "back to top" floating action button 
+        Scaffold(
+          floatingActionButton: _showBackToTop
+          ? FloatingActionButton(
+              onPressed: () {
+                _scrollController.animateTo(
+                  0,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
                 );
-              }).toList(),
-              onChanged: (String? newSelectedFilter) {
-                if (newSelectedFilter != null) {
-                  setState(() {
-                    selectedFilter = newSelectedFilter;
-                    itemsToLoad = 10;
-                  });
-                }
               },
-            ),
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: filteredEpisodes.take(itemsToLoad).length +
-                    (!isLoadingMore ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == itemsToLoad && isLoadingMore) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (index >= filteredEpisodes.length) {
-                    return const SizedBox.shrink();
-                  }
-
-                  final Episode show = filteredEpisodes[index];
-                  return _OnDemandListTile(
-                    podcastName: show.podcastName,
-                    podcastImageUrl: show.podcastImageUrl,
-                    podcastEpisodeName: show.episodeName,
-                    podcastEpisodeDate: show.episodeDate,
-                    podcastEpisodeStreamUrl: show.episodeStreamUrl,
+              child: const Icon(Icons.arrow_upward),
+            )
+          : null,
+          // Future builder displays loading icon until first batch of shows is loaded, then it shows list of shows
+          body: FutureBuilder(
+                future: onDemandFuture,
+                builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Error fetching shows'));
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text('No shows available'));
+          } else {
+            final onDemand = snapshot.data!;
+            filters = [
+              'All',
+              ...onDemand.episodes.map((e) => e.podcastName).toSet()
+            ];
+            final filteredEpisodes = selectedFilter == filters[0]
+                ? onDemand.episodes
+                : onDemand.episodes
+                    .where((episode) => episode.podcastName == selectedFilter)
+                    .toList();
+          
+            return Column(children: [
+              // Dropdown select shows to view - "All", or filter to one podcast
+              DropdownButton<String>(
+                value: selectedFilter, // Set the current value
+                items: filters.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
                   );
+                }).toList(),
+                onChanged: (String? newSelectedFilter) {
+                  if (newSelectedFilter != null) {
+                    setState(() {
+                      selectedFilter = newSelectedFilter;
+                      itemsToLoad = 10;
+                    });
+                  }
                 },
               ),
-            )
-          ]);
-        }
-      },
-    );
+          
+              // List of shows - load as we go for performance
+              Expanded(
+                child: Scrollbar(
+                  controller: _scrollController,
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount: filteredEpisodes.take(itemsToLoad).length +
+                        (isLoadingMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == itemsToLoad && isLoadingMore) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                  
+                      if (index >= filteredEpisodes.length) {
+                        return const SizedBox.shrink();
+                      }
+                  
+                      final Episode show = filteredEpisodes[index];
+                      return _OnDemandListTile(
+                        podcastName: show.podcastName,
+                        podcastImageUrl: show.podcastImageUrl,
+                        podcastEpisodeName: show.episodeName,
+                        podcastEpisodeDate: show.episodeDate,
+                        podcastEpisodeStreamUrl: show.episodeStreamUrl,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ]); 
+          }
+                },
+              ),
+        );
   }
 }
 
+// Defines view for a single show in the list
 class _OnDemandListTile extends StatelessWidget {
   // ignore: use_super_parameters
   const _OnDemandListTile({

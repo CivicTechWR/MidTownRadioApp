@@ -25,7 +25,7 @@ class PlayerWidget extends StatelessWidget {
         top: 8.0,
         left: 8.0,
         right: 8.0,
-        bottom: safePadding + 30,
+        bottom: safePadding,
       ),
       decoration: BoxDecoration(
         color: theme.cardColor,
