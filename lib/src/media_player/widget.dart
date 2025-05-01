@@ -31,7 +31,7 @@ class PlayerWidget extends StatelessWidget {
           ), 
           Expanded(
             child: Text(
-              playerProvider.currentSreamUrl ?? 'No stream selected',
+               (playerProvider.currentSreamUrl == 'https://midtownradiokw.out.airtime.pro/midtownradiokw_a') ? 'Live from Midtown Radio' : playerProvider.currentSreamUrl ?? 'No stream selected',
               overflow: TextOverflow.ellipsis,
             ),
           ),
