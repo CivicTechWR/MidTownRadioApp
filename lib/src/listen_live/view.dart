@@ -20,13 +20,15 @@ class ListenLivePage extends StatelessWidget {
               // final processingState =
               //     snapshot.data?.processingState ?? AudioProcessingState.idle;
               return ElevatedButton(
-                onPressed: () => audioPlayerHandler.setStream(
-                  MediaItem(
-                    id: 'https://midtownradiokw.out.airtime.pro/midtownradiokw_a',
-                    title: 'Midtown Radio KW',
-                    isLive: true,
-                  )
-                ),
+                onPressed: () => audioPlayerHandler.isPlaying
+                    ? audioPlayerHandler.stop()
+                    : audioPlayerHandler.setStream(
+                        MediaItem(
+                          id: 'https://midtownradiokw.out.airtime.pro/midtownradiokw_a',
+                          title: 'Midtown Radio KW',
+                          isLive: true,
+                        ))
+                ,
                 child:
                     Icon(playing ? Icons.pause : Icons.play_arrow, size: 100),
               );

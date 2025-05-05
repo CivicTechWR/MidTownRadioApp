@@ -14,7 +14,12 @@ class AudioPlayerHandler extends BaseAudioHandler {
 
   AudioPlayerHandler() {
     playbackState.add(playbackState.value.copyWith(
-        controls: [MediaControl.stop, MediaControl.play],
+        controls: [
+          MediaControl.stop, 
+          _isPlaying
+            ? MediaControl.pause
+            : MediaControl.play
+          ],
         androidCompactActionIndices: [0,1],
         processingState: AudioProcessingState.loading));
   }
