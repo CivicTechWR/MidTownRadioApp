@@ -1,4 +1,4 @@
-package com.civitechwr.midtownradio.app.ctwr_midtown_radio_app
+package com.civitechwr.midtownradio.app
 
 import io.flutter.embedding.android.FlutterActivity
 
