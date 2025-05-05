@@ -60,14 +60,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-  plugin:
-    platforms:
-      android:
-        package: com.ryanheise.audioservice
-        pluginClass: AudioServicePlugin
-      ios:
-        pluginClass: AudioServicePlugin
-        sharedDarwinSource: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
