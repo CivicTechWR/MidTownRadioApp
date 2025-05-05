@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.civitechwr.midtownradio.app"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35 //flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
