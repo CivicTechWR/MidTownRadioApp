@@ -20,8 +20,6 @@ class PlayerWidget extends StatelessWidget {
       stream: audioHandler.playbackState,
       builder:(context, snapshot) {
         final isPlaying = audioPlayerHandler.isPlaying;
-        final isLoading = audioPlayerHandler.isLoading;
-        final processingState = snapshot.data?.processingState ?? AudioProcessingState.idle;
         return Container(
       
       // can adjust this margin to raise this widget - I picked +20 arbitrairily
