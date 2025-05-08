@@ -18,15 +18,39 @@ class HomePage extends StatelessWidget {
         drawer: const MainAppDrawer(),
         body: Column(
           children: [
-            const TabBar(
-              tabs: [
-                Tab(
-                  icon: Icon(Icons.radio),
-                  text: 'Listen Live'
+            Stack(
+              children: [
+                SizedBox(
+                  height: 50,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: List<Widget>.filled(1 /* The Number of Tabs */, Expanded(
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFf05959),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),),
+                  ),
                 ),
-                Tab(
-                  icon: Icon(Icons.podcasts),
-                  text: 'On Demand'
+                TabBar(
+                  labelColor: (Theme.of(context).brightness == Brightness.dark) ?Color.fromRGBO(23, 204, 204, 1):Color(0xff00989d),
+                  indicatorColor: (Theme.of(context).brightness == Brightness.dark) ? Colors.white:Colors.black,
+                  tabs: [
+                    Tab(
+                      child: Text("LISTEN LIVE",
+                      style: TextStyle(fontSize: 18,fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                    Tab(
+                      child: Text("ON DEMAND",
+                      style: TextStyle(fontSize: 18,fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

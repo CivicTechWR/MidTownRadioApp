@@ -4,8 +4,4 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permissions.WAKE_LOCK" />
-    <uses-permission android:name="android.permissions.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permissions.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
-    
 </manifest>

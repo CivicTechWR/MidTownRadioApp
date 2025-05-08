@@ -1,33 +1,22 @@
+import 'package:ctwr_midtown_radio_app/src/media_player/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:audio_service/audio_service.dart';
+import 'package:provider/provider.dart';
 import 'package:ctwr_midtown_radio_app/src/app.dart';
 import 'package:ctwr_midtown_radio_app/src/settings/controller.dart';
 import 'package:ctwr_midtown_radio_app/src/settings/service.dart';
-import 'package:ctwr_midtown_radio_app/src/media_player/audio_player_handler.dart';
+import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
 
-// Initiate singleton for app access to system audio controls
-late AudioHandler audioHandler;
-late AudioPlayerHandler audioPlayerHandler;
+
 void main() async {
   // Ensure that plugin services are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
   final settingsController = SettingsController(SettingsService());
+  
+  final playerService = PlayerService();
+  await playerService.init();
 
-  audioPlayerHandler = AudioPlayerHandler();
-  
-  audioHandler = await AudioService.init(
-    builder: () => audioPlayerHandler,
-    config: AudioServiceConfig(
-      androidNotificationChannelId: 'com.civitechwr.midtownradio.app',
-      androidNotificationChannelName: 'Audio playback',
-      androidNotificationOngoing: true,
-      androidStopForegroundOnPause: true,
-      androidNotificationIcon: 'mipmap/launcher_icon'
-    ),
-  );
-  
   // Load settings
   await settingsController.loadSettings();
 
@@ -37,5 +26,7 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
   
-  runApp(MidtownRadioApp(settingsController: settingsController));
+  runApp(ChangeNotifierProvider(
+    create: (_) => PlayerProvider(playerService),
+    child: MidtownRadioApp(settingsController: settingsController)));
 }
