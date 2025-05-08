@@ -71,14 +71,6 @@ class ListenLivePage extends StatelessWidget {
                     );
             }),
         SizedBox(height: 20),
-        Text(
-          'Listen Live!',
-          style: TextStyle(
-            fontSize: 34,
-            fontWeight: FontWeight.bold,
-          ),
-          maxLines: 1,
-        ),
         SizedBox(height: 10),
         //PlayerWidget()
       ],
