@@ -37,7 +37,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_launcher_icons: ^0.14.3
-  provider: ^6.1.4
   just_audio: ^0.10.1
   audio_session: ^0.2.1
   intl: any
@@ -61,6 +60,17 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+<<<<<<< Updated upstream
+=======
+  # plugin:
+  #   platforms:
+  #     android:
+  #       package: com.ryanheise.audioservice
+  #       pluginClass: AudioServicePlugin
+  #     ios:
+  #       pluginClass: AudioServicePlugin
+  #       # sharedDarwinSource: true
+>>>>>>> Stashed changes
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

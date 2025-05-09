@@ -1,6 +1,6 @@
+import 'package:ctwr_midtown_radio_app/main.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
+import 'package:audio_service/audio_service.dart';
 
 class PlayerWidget extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
@@ -12,12 +12,15 @@ class PlayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final playerProvider = Provider.of<PlayerProvider>(context);
     final mediaQuery = MediaQuery.of(context);
     final safePadding = mediaQuery.viewPadding.bottom;
     final theme = Theme.of(context);
 
-    return Container(
+    return StreamBuilder<PlaybackState>(
+      stream: audioHandler.playbackState,
+      builder:(context, snapshot) {
+        final isPlaying = audioPlayerHandler.isPlaying;
+        return Container(
       
       // can adjust this margin to raise this widget - I picked +20 arbitrairily
       // safePadding puts it above any OS buttons like the IOS home swipe bar, so it should stay
@@ -35,7 +38,7 @@ class PlayerWidget extends StatelessWidget {
       child: Row(
         children: [
           // play/pause button
-          playerProvider.isLoading
+          snapshot.data?.processingState == AudioProcessingState.buffering
               ? const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -47,14 +50,14 @@ class PlayerWidget extends StatelessWidget {
                   ),
                 )
               : IconButton(
-                  icon: Icon(playerProvider.isPlaying
+                  icon: Icon(isPlaying
                     ? Icons.pause
                     : Icons.play_arrow),
                   onPressed: () {
-                    if (playerProvider.isPlaying) {
-                      playerProvider.pause();
-                    } else if (playerProvider.currentSreamUrl != null) {
-                      playerProvider.play();
+                    if (isPlaying) {
+                      audioHandler.pause();
+                    } else if (audioPlayerHandler.isCurrentlyPlaying.isNotEmpty && audioPlayerHandler.isCurrentlyPlaying != "Nothing is loaded...") {
+                      audioHandler.play();
                     }
                   },
                 ),
@@ -70,7 +73,7 @@ class PlayerWidget extends StatelessWidget {
                   )
                 ),
                 Text(
-                  playerProvider.titleCurrentlyPlaying,
+                  audioPlayerHandler.isCurrentlyPlaying,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -79,5 +82,5 @@ class PlayerWidget extends StatelessWidget {
         ],
       ),
     );
-  }
-}
+  });
+}}

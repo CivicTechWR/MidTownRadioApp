@@ -1,6 +1,6 @@
+import 'package:audio_service/audio_service.dart';
+import 'package:ctwr_midtown_radio_app/main.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:ctwr_midtown_radio_app/src/media_player/provider.dart';
 import 'package:ctwr_midtown_radio_app/src/on_demand/controller.dart';
 
 class OnDemandPage extends StatefulWidget {
@@ -190,32 +190,41 @@ class _OnDemandListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final onDemand = Provider.of<OnDemand>(context, listen: false);
-    // final cachedImage = onDemand.getCachedImage(podcastName);
-    final playerProvider = Provider.of<PlayerProvider>(context);
-    return ListTile(
-      leading: Image.network(podcastImageUrl), // cachedImage != null ? Image.memory(cachedImage) : Image.network(podcastImageUrl),
-      title: Text(
-        podcastEpisodeName,
-        maxLines: 1,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(podcastName),
-          Text(podcastEpisodeDate),
-        ],
-      ),
-      selected: playerProvider.currentSreamUrl ==
-          podcastEpisodeStreamUrl, // Fixed typo
-      selectedTileColor: Theme.of(context).highlightColor,
-      onTap: () => playerProvider.setStream(
-        url: podcastEpisodeStreamUrl,
-        title: podcastEpisodeName,
-      ),
+    return StreamBuilder<MediaItem?>(
+        stream: audioHandler.mediaItem, // Listen to the current media item
+        builder: (context, snapshot) {
+          final currentMediaItem = snapshot.data;
+          final isSelected = currentMediaItem?.id == podcastEpisodeStreamUrl;
+
+          return ListTile(
+              leading: Image.network(
+                  podcastImageUrl), // cachedImage != null ? Image.memory(cachedImage) : Image.network(podcastImageUrl),
+              title: Text(
+                podcastEpisodeName,
+                maxLines: 1,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(podcastName),
+                  Text(podcastEpisodeDate),
+                ],
+              ),
+              selected: isSelected,
+              selectedTileColor: Theme.of(context).highlightColor,
+              onTap: () => audioPlayerHandler.setStream(
+                MediaItem(
+                  id: podcastEpisodeStreamUrl, 
+                  title: podcastEpisodeName,
+                  album: podcastName,
+                  artUri: Uri.parse(podcastImageUrl),
+                  )
+                )
+              );
+      }
     );
   }
 }
