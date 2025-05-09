@@ -47,7 +47,8 @@ class MidtownRadioState extends State<MidtownRadioStateful> {
 
             builder: (context, child) => Scaffold(
                 body: child,
-                bottomSheet: StreamBuilder<PlaybackState>(
+                // Changed to nav bar so that body contents don't end up behind it
+                bottomNavigationBar: StreamBuilder<PlaybackState>(
                     stream: audioHandler.playbackState,
                     builder: (context, snapshot) {
                       return (audioPlayerHandler.isPlaying)
